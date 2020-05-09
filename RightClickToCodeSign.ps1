@@ -6,7 +6,7 @@
 .EXAMPLE
     Install the Script, select the Code Signing Cert from a menu
     RightClickToCodeSign.ps1 -Install -InstallSelectCert -timestamp "http://timestamp.digicert.com" -Algorithm SHA256
-
+.EXAMPLE
     Install the Script, select the Code Signing Cert using the Subject and Issuer (use * as a wildcard)
     RightClickToCodeSign.ps1 -Install -Subject "Andrews Code Si*" -Issuer "Andrew*" -timestamp "http://timestamp.digicert.com" -Algorithm SHA256
 .EXAMPLE
@@ -32,43 +32,49 @@ Param (
     [string[]]
     $LiteralPath,
 
-    # Uninstall Switch Run this Script with the uninstall Switch to uninstall the Script and remove the Registry changes to your account
+    # Uninstall Switch: Run this Script with the uninstall Switch to uninstall the Script and remove the Registry changes to your account
     [Parameter(Mandatory = $false, ParameterSetName = "Uninstall")]
     [switch]
     $Uninstall = $false,
 
-    # Install Switch Run this Script with the Install Switch to Install the Script and add the Registry changes to your account
+    # Install Switch: Run this Script with the Install Switch to Install the Script and add the Registry changes to your account
     [Parameter(Mandatory = $false, ParameterSetName = "Install")]
     [Parameter(Mandatory = $false, ParameterSetName = "InstallChooseCert")]
     [switch]
     $Install = $false,
 
-    [Parameter(Mandatory = $true, ParameterSetName = "Install")]
-    [Parameter(Mandatory = $true, ParameterSetName = "InstallChooseCert")]
+    # Extension List: Choose the Extensions to add the right-click context menu to
+    [Parameter(Mandatory = $false, ParameterSetName = "Install")]
+    [Parameter(Mandatory = $false, ParameterSetName = "InstallChooseCert")]
     [String[]]
-    $ExtensionList = ".ps1",
+    $ExtensionList = @(".ps1",".exe"),
 
+    # InstallChooseCert Switch: Add this switch to choose the cert to sign with directly from a pop-up menu instead of specifying the subject and Issuer
     [Parameter(Mandatory = $true, ParameterSetName = "InstallChooseCert")]
     [switch]
     $InstallChooseCert = $false,
 
+    # Issuer: The issuer to search for, supports the * wildcard
     [Parameter(Mandatory = $true, ParameterSetName = "Install")]
     [String]
     $Issuer,
 
+    # Subject: The subject of the cert to search for, supports the * wildcard
     [Parameter(Mandatory = $true, ParameterSetName = "Install")]
     [String]
     $Subject,
 
+    # Timestamp: The timestamp server for signing
     [Parameter(Mandatory = $true, ParameterSetName = "Install")]
     [Parameter(Mandatory = $true, ParameterSetName = "InstallChooseCert")]
     [String]
     $Timestamp,
 
-    [Parameter(Mandatory = $true, ParameterSetName = "Install")]
-    [Parameter(Mandatory = $true, ParameterSetName = "InstallChooseCert")]
+    # Algorithm: The algorithm to use when signing files, default is SHA256
+    [Parameter(Mandatory = $false, ParameterSetName = "Install")]
+    [Parameter(Mandatory = $false, ParameterSetName = "InstallChooseCert")]
     [String]
-    $Algorithm
+    $Algorithm = "SHA256"
 )
 
 $Global:NameOfThisScript = "RightClickToCodeSign"
@@ -99,7 +105,8 @@ if ($Install) {
         New-ItemProperty -LiteralPath "HKCU:\Software\Classes\SystemFileAssociations\$($extension)\shell\$($Global:RightClickName)\command" -Name '(default)' -Value "C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$env:LOCALAPPDATA\$($Global:ScriptFileName)\$($Global:ScriptFileName).ps1`" -LiteralPath '%1'" -PropertyType String -Force -ea SilentlyContinue;
     }
 
-    Write-Output "Installation Complete, You should test CodeSigning on the file: `"$env:LOCALAPPDATA\$($Global:ScriptFileName)\$($Global:ScriptFileName).ps1`""
+    Write-Output "Installation Complete, You should test CodeSigning on the file: `"$env:LOCALAPPDATA\$($Global:ScriptFileName)\$($Global:ScriptFileName).ps1`" (The path has been copied to your clipboard)"
+    Write-Output "$env:LOCALAPPDATA\$($Global:ScriptFileName)" | Set-Clipboard
     Pause
 }
 
