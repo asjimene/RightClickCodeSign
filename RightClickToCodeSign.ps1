@@ -5,7 +5,7 @@
      RightClickToCodeSign is a simple PowerShell script that adds a right click context menu to Code Sign Files using the right click menu.
 .EXAMPLE
     Install the Script, select the Code Signing Cert from a menu
-    RightClickToCodeSign.ps1 -Install -InstallSelectCert -timestamp "http://timestamp.digicert.com" -Algorithm SHA256
+    RightClickToCodeSign.ps1 -Install -InstallChooseCert -timestamp "http://timestamp.digicert.com" -Algorithm SHA256
 .EXAMPLE
     Install the Script, select the Code Signing Cert using the Subject and Issuer (use * as a wildcard)
     RightClickToCodeSign.ps1 -Install -Subject "Andrews Code Si*" -Issuer "Andrew*" -timestamp "http://timestamp.digicert.com" -Algorithm SHA256
